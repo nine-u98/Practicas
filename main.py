@@ -1,7 +1,20 @@
+import random
+import os
 import time
-from pygame import mixer
 
 
+# Constantes de colores
+BLACK = '\033[30m'
+RED = '\033[31m'
+GREEN = '\033[32m'
+YELLOW = '\033[33m'
+BLUE = '\033[34m'
+MAGENTA = '\033[35m'
+CYAN = '\033[36m'
+WHITE = '\033[37m'
+RESET = '\033[39m'
+
+# Coleccion de preguntas
 def data():
     lista = [
         # Pregunta 1
@@ -14,7 +27,6 @@ def data():
              'c': "Elfos del bosque",
              'd': "Grandes Águilas",
              'result': 'b'},
-            # 2
             ["La casa de Durin se refiere al clan de enanos que habitaban las Montañas Nubladas. La mayoría de los clanes enanos pueden rastrear a sus ancestros hasta la casa de Durin."]  # 2
         ],
         # Pregunta 2
@@ -110,43 +122,92 @@ def data():
     ]
     return lista
 
+# Funcion random me retorna una lista con numeros random agregados sin repetirse
+def aleatorynumber(data):
+    i, lista = 0, []
+    while i < len(data):
+        L = random.randint(0, len(data)-1)
+        if L not in lista:
+            lista.append(L)
+            i += 1
+    return lista
 
-def trivia(data):
-    count, incorrectos = 0, 0
-    for i in data:
-        for e in i:
-            if isinstance(e, dict):
-                for u in e:
-                    if u != 'result':
-                        print(f"{u}) {e[u]}")
+# Funcion trivia contiene toda la logica de la trivia
+def trivia(data, nombre, aleatory):
+    count, incorrectos, score = 0, 0, 0
+    """ Creo un ciclo que recorra mi lista de numeros aleatorios sin repeticion"""
+    for num in aleatory: #
+        for item in data[num]: # Recorre los elementos que esten en data[i]
+            if isinstance(item, dict): # Si el elemento e es de tipo dict entonces ejecuta el bloque
+                # recorre el diccionario en busca de las opciones - la key result
+                for key in item:
+                    if key != 'result':# Si es diferente a result ejecuta el codigo
+                        print(f"{GREEN}{key}){RESET} {MAGENTA}{item[key]}{RESET}") # Imprime la key y la pregunta item[key]
                     else:
-                        n = input(">>> ".lower())
-                        if n == e[u]:
-                            count += 1
-                            print('Correcto')
-                        else:
-                            incorrectos += 1
-                            print("Incorrecto")
-                            time.sleep(2.4)
-            else:
-                print("".join(e))
-    print('\ncorrecto', count)
-    print('incorrecto', incorrectos)
+                        # Evalua la respuesta
+                        while True:
+                            opcion = input(">>> ".lower())
+                            
+                            if opcion == 'x': # Opcion especial
+                                if input(CYAN+"Deseas ver las respuestas [s/n] : "+RESET) == 's':
+                                    for number in range(len(data) - 1): # number al rango de (0, len(data) retorna 10 - 9 )
+                                        print(
+                                            f"{BLUE}{''.join(data[number][0])}{RESET}" + f" respuesta : {GREEN}{data[number][1]['result']}{RESET}") # Imprime la key y la pregunta uso join para convertir la lista a str
+                                    exit()
+                                else: # En el caso que escriba cualquier otra letra que no sea 's' se ejecuta el else
+                                    os.system('clear') # limpia la consola
+                                    continue
+                            elif opcion == 'exit' or opcion == 'salir': # Opcion exit
+                                exit()
+                            # recorre la opcion ingresada este en las opciones establecidas en data
+                            elif opcion in list(item.keys())[:-1]: # Tambien se puede poner >> n in ['a', 'b', 'c', 'd']
+                                if opcion == item[key]: # Se compara la opcion con el item[key]
+                                    count += 1
+                                    score += 10
+                                    print(GREEN+'Correcto'+RESET)
+                                    time.sleep(1.0)
+                                    break
+                                else:
+                                    incorrectos += 1
+                                    score -= 10
+                                    print(RED+"Incorrecto"+RESET)
+                                    time.sleep(1.0)
+                                    break
+                            else: # En el caso que no sea una opcion establecida en data ni en las opciones te pedira volver a ingresar ya que el bucle es while True y solo en las opciones tiene un break
+                                print(
+                                    RED+"Valor ingresado incorrecto vuelve ingresar un valor"+RESET)
+            else: # Imprime todo lo que no sea diccionario 
+                print(f'\n{YELLOW}{"".join(item)}{RESET}') # join convierte una lista a str
+                time.sleep(1.0)
+    # Imprime los resultado
+    print(f"""
 
+{RED}{'*' * 5} Resultados : de {RESET}{YELLOW}{nombre}{RESET}
+\n{GREEN}correcto' :{RESET} {YELLOW}{count}{RESET}
+{GREEN}incorrecto' :{RESET} {YELLOW}{incorrectos}{RESET}
+{BLUE}{nombre} {RESET}{WHITE}tu puntuacion es :{RESET} {YELLOW}{score}{RESET}
+""")
+    # Condicional evalua si se desea volver a ejecutar la trivia
+    trivia(data, nombre, aleatory) if input(CYAN+"¿Deseas volver intentar la trivia? [s]  "+RESET)  == 's' else print(WHITE+"\nEspero que lo hayas pasado muy bien, hasta pronto."+RESET)
 
+# La funcion banners recorre banner.txt, lo uso como inicio a la trivia
 def banners():
-    banners = ['./resources/banner2.txt', './resources/banner.txt']
+    banners = ['./resources/banner.txt']
     for i in banners:
         with open(i) as f_obj:
             lines = f_obj.readlines()
             for line in lines:
-                print(line)
-            time.sleep(2.0)
+                print(MAGENTA+line+RESET)
+            time.sleep(1.0)
+
 
 if __name__ == '__main__':
-    mixer.init()
-    mixer.music.load('./resources/theshire.mp3')
-    mixer.music.set_volume(1.0)
-    mixer.music.play()
-    banners()
-    trivia(data())
+    print(f"""
+{BLUE}Bienvenido a la trivia del Señor de los anillos
+¿Quieres realizar este reto?
+La trivia consta de 10 preguntas
+{RESET}""")
+    if input(RED+"¿Quieres iniciar? [Presiona s] "+RESET).lower() == 's':
+        nom = input(MAGENTA + "Ingresa tu usuario : " + RESET).capitalize()
+        banners()
+        trivia(data(), nom, aleatorynumber(data()))
