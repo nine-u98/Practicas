@@ -1,5 +1,4 @@
 import random
-import os
 import time
 
 
@@ -163,7 +162,7 @@ def trivia(data, nombre, aleatory):
                                     if inpt:
                                         if inpt == 's':
                                             # number al rango de (0, len(data) retorna 10 - 9 )
-                                            for number in range(len(data) - 1):
+                                            for number in range(len(data)):
                                                 print(
                                                     f"{BLUE}{''.join(data[number][0])}{RESET}" + f" respuesta : {GREEN}{data[number][1]['result']}{RESET}")  # Imprime la key y la pregunta uso join para convertir la lista a str
                                             exit()
