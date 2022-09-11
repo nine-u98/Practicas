@@ -213,7 +213,7 @@ def trivia(data, nombre, aleatory):
         inpt = input(
             CYAN+"¿Deseas volver intentar la trivia? [Presiona (s/n)] "+RESET).lower().strip()
         if inpt:
-            if inpt.lower() == 's':
+            if inpt == 's':
                 trivia(data, nombre, aleatory)
             elif inpt == 'n':
                 print(WHITE+"\nEspero que lo hayas pasado muy bien, hasta pronto."+RESET)
