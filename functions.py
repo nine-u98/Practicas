@@ -9,7 +9,7 @@ from data import *
 def aleatorynumber(data):
     i, lista = 0, []
     while i < len(data):
-        L = random.randint(0, len(data)-1)
+        L = random.randint(0, len(data))
         if L not in lista:
             lista.append(L)
             i += 1
